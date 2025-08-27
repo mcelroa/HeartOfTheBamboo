@@ -1,6 +1,11 @@
-[gd_scene load_steps=14 format=3 uid="uid://c8c8py2k5ylmv"]
+[gd_scene load_steps=19 format=3 uid="uid://c8c8py2k5ylmv"]
 
 [ext_resource type="Texture2D" uid="uid://dha6ho7wu1l3d" path="res://assets/enemy/dino_enemy.png" id="1_4a83h"]
+[ext_resource type="Script" uid="uid://77ixoadsowix" path="res://scripts/enemy/enemy.gd" id="1_40wdo"]
+[ext_resource type="PackedScene" uid="uid://bubrsau08gtcp" path="res://scenes/components/animation_component.tscn" id="1_a3pup"]
+[ext_resource type="Script" uid="uid://cfyhkndgantue" path="res://scripts/states/state_machine.gd" id="3_tjssy"]
+[ext_resource type="Script" uid="uid://dadfjyy48iiyd" path="res://scripts/states/enemy/enemy_idle.gd" id="4_gl05p"]
+[ext_resource type="Script" uid="uid://dcb4djnsl3n5f" path="res://scripts/states/enemy/enemy_follow.gd" id="5_cwlon"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a3pup"]
 atlas = ExtResource("1_4a83h")
@@ -58,7 +63,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_gl05p")
 }],
 "loop": true,
-"name": &"idle",
+"name": &"idle_side",
 "speed": 7.0
 }, {
 "frames": [{
@@ -81,7 +86,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_peoo5")
 }],
 "loop": true,
-"name": &"run",
+"name": &"walk_side",
 "speed": 8.0
 }]
 
@@ -90,11 +95,28 @@ radius = 4.0
 height = 12.0
 
 [node name="Enemy" type="CharacterBody2D"]
+script = ExtResource("1_40wdo")
+
+[node name="AnimationComponent" parent="." node_paths=PackedStringArray("sprite") instance=ExtResource("1_a3pup")]
+sprite = NodePath("../AnimatedSprite2D")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("3_tjssy")
+initial_state = NodePath("Follow")
+
+[node name="Idle" type="Node" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("4_gl05p")
+enemy = NodePath("../..")
+metadata/_custom_type_script = "uid://dadfjyy48iiyd"
+
+[node name="Follow" type="Node" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("5_cwlon")
+enemy = NodePath("../..")
+metadata/_custom_type_script = "uid://dcb4djnsl3n5f"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_2f3il")
-animation = &"idle"
-frame_progress = 0.728581
+animation = &"walk_side"
 offset = Vector2(0, -9)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
